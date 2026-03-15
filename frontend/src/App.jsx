@@ -1,26 +1,34 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
+import Projects from "./pages/Projects";
+import Tasks from "./pages/Tasks";
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
 
 function App() {
+  return (
+    <Router>
+      <div className="d-flex">
+        
+        <Sidebar />
 
-return (
+        <div className="container-fluid">
+          <Navbar />
 
-<BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/tasks" element={<Tasks />} />
+          </Routes>
 
-<Routes>
-
-<Route path="/" element={<Login />} />
-<Route path="/dashboard" element={<Dashboard />} />
-<Route path="/employees" element={<Employees />} />
-
-</Routes>
-
-</BrowserRouter>
-
-);
-
+        </div>
+      </div>
+    </Router>
+  );
 }
 
 export default App;

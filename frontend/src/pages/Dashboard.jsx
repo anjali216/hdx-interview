@@ -1,19 +1,13 @@
-function Dashboard(){
+import React from "react";
 
-return(
+function Dashboard() {
+  return (
+    <div className="p-4">
+      <h2>Dashboard</h2>
 
-<div>
-
-<h1>Dashboard</h1>
-
-<p>Total Employees</p>
-<p>Total Projects</p>
-<p>Total Tasks</p>
-
-</div>
-
-)
-
+      <p>Welcome to the Employee Management Dashboard</p>
+    </div>
+  );
 }
 
-export default Dashboard
+export default Dashboard;
