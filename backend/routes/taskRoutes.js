@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
 
-const Project = require("../models/Project");
+const Task = require("../models/Task");
 const authMiddleware = require("../middleware/authMiddleware");
 
 
-// GET all projects
+// GET all tasks
 router.get("/", authMiddleware, async (req, res) => {
 
   try {
 
-    const projects = await Project.find();
+    const tasks = await Task.find();
 
-    res.json(projects);
+    res.json(tasks);
 
   } catch (error) {
 
@@ -23,16 +23,16 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 
-// CREATE project
+// CREATE task
 router.post("/", authMiddleware, async (req, res) => {
 
   try {
 
-    const project = new Project(req.body);
+    const task = new Task(req.body);
 
-    await project.save();
+    await task.save();
 
-    res.json({ message: "Project Created", project });
+    res.json({ message: "Task Created", task });
 
   } catch (error) {
 
@@ -43,18 +43,18 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 
-// UPDATE project
+// UPDATE task
 router.put("/:id", authMiddleware, async (req, res) => {
 
   try {
 
-    const project = await Project.findByIdAndUpdate(
+    const task = await Task.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
 
-    res.json({ message: "Project Updated", project });
+    res.json({ message: "Task Updated", task });
 
   } catch (error) {
 
@@ -65,14 +65,14 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 
-// DELETE project
+// DELETE task
 router.delete("/:id", authMiddleware, async (req, res) => {
 
   try {
 
-    await Project.findByIdAndDelete(req.params.id);
+    await Task.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "Project Deleted" });
+    res.json({ message: "Task Deleted" });
 
   } catch (error) {
 
