@@ -1,85 +1,13 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
+const authorize = require('../middleware/roleMiddleware');
+const { createTask, updateTaskStatus } = require('../controllers/taskController');
 
-const Task = require("../models/Task");
-const authMiddleware = require("../middleware/authMiddleware");
+// Admins and Managers can create tasks 
+router.post('/', protect, authorize('Admin', 'Manager'), createTask);
 
-
-// GET all tasks
-router.get("/", authMiddleware, async (req, res) => {
-
-  try {
-
-    const tasks = await Task.find();
-
-    res.json(tasks);
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// CREATE task
-router.post("/", authMiddleware, async (req, res) => {
-
-  try {
-
-    const task = new Task(req.body);
-
-    await task.save();
-
-    res.json({ message: "Task Created", task });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// UPDATE task
-router.put("/:id", authMiddleware, async (req, res) => {
-
-  try {
-
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.json({ message: "Task Updated", task });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// DELETE task
-router.delete("/:id", authMiddleware, async (req, res) => {
-
-  try {
-
-    await Task.findByIdAndDelete(req.params.id);
-
-    res.json({ message: "Task Deleted" });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
+// Employees can update their own assigned tasks [cite: 24]
+router.put('/:id/status', protect, updateTaskStatus);
 
 module.exports = router;

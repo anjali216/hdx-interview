@@ -1,85 +1,12 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
+const authorize = require('../middleware/roleMiddleware');
+const { createProject, getProjects } = require('../controllers/projectController');
 
-const Project = require("../models/Project");
-const authMiddleware = require("../middleware/authMiddleware");
-
-
-// GET all projects
-router.get("/", authMiddleware, async (req, res) => {
-
-  try {
-
-    const projects = await Project.find();
-
-    res.json(projects);
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// CREATE project
-router.post("/", authMiddleware, async (req, res) => {
-
-  try {
-
-    const project = new Project(req.body);
-
-    await project.save();
-
-    res.json({ message: "Project Created", project });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// UPDATE project
-router.put("/:id", authMiddleware, async (req, res) => {
-
-  try {
-
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.json({ message: "Project Updated", project });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
-
-
-// DELETE project
-router.delete("/:id", authMiddleware, async (req, res) => {
-
-  try {
-
-    await Project.findByIdAndDelete(req.params.id);
-
-    res.json({ message: "Project Deleted" });
-
-  } catch (error) {
-
-    res.status(500).json({ message: error.message });
-
-  }
-
-});
+// Admin and Manager can create; everyone can view [cite: 22, 23, 24]
+router.route('/')
+  .get(protect, getProjects)
+  .post(protect, authorize('Admin', 'Manager'), createProject);
 
 module.exports = router;

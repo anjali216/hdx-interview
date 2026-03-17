@@ -1,80 +1,35 @@
-const Employee = require("../models/Employee");
-
+const User = require('../models/User');
 
 exports.getEmployees = async (req, res) => {
   try {
+    const { page = 1, limit = 10, search = '' } = req.query;
+    const query = {
+      role: 'Employee',
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { department: { $regex: search, $options: 'i' } }
+      ]
+    };
 
-    const employees = await Employee.find();
+    const employees = await User.find(query)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .sort({ createdAt: -1 });
 
-    res.json(employees);
-
+    const count = await User.countDocuments(query);
+    res.json({ employees, totalPages: Math.ceil(count / limit), currentPage: page });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
-
-exports.getEmployeeById = async (req, res) => {
-  try {
-
-    const employee = await Employee.findById(req.params.id);
-
-    res.json(employee);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-exports.createEmployee = async (req, res) => {
-  try {
-
-    const employee = new Employee(req.body);
-
-    await employee.save();
-
-    res.status(201).json({
-      message: "Employee created successfully",
-      employee
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-exports.updateEmployee = async (req, res) => {
-  try {
-
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.json({
-      message: "Employee updated",
-      employee
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 
 exports.deleteEmployee = async (req, res) => {
-  try {
-
-    await Employee.findByIdAndDelete(req.params.id);
-
-    res.json({
-      message: "Employee deleted"
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const employee = await User.findById(req.params.id);
+  if (employee) {
+    await employee.deleteOne();
+    res.json({ message: 'Employee removed' });
+  } else {
+    res.status(404).json({ message: 'Employee not found' });
   }
 };

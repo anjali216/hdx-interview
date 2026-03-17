@@ -1,20 +1,13 @@
-const router = require("express").Router();
-const Employee = require("../models/Employee");
+const express = require('express');
+const router = express.Router();
+const { getEmployees, deleteEmployee } = require('../controllers/employeeController');
+const { protect } = require('../middleware/authMiddleware');
+const authorize = require('../middleware/roleMiddleware');
 
-router.get("/", async (req, res) => {
-  const employees = await Employee.find();
-  res.json(employees);
-});
+router.route('/')
+  .get(protect, getEmployees); // Admin/Manager view
 
-router.post("/", async (req, res) => {
-  const employee = new Employee(req.body);
-  await employee.save();
-  res.json("Employee Added");
-});
-
-router.delete("/:id", async (req, res) => {
-  await Employee.findByIdAndDelete(req.params.id);
-  res.json("Employee Deleted");
-});
+router.route('/:id')
+  .delete(protect, authorize('Admin'), deleteEmployee);
 
 module.exports = router;

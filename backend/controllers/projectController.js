@@ -1,80 +1,19 @@
-const Project = require("../models/Project");
-
-
-exports.getProjects = async (req, res) => {
-  try {
-
-    const projects = await Project.find();
-
-    res.json(projects);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-exports.getProjectById = async (req, res) => {
-  try {
-
-    const project = await Project.findById(req.params.id);
-
-    res.json(project);
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
+const Project = require('../models/Project');
 
 exports.createProject = async (req, res) => {
-  try {
-
-    const project = new Project(req.body);
-
-    await project.save();
-
-    res.status(201).json({
-      message: "Project created",
-      project
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const { name, description, manager, employees, deadline } = req.body;
+  const project = await Project.create({ name, description, manager, employees, deadline });
+  res.status(201).json(project);
 };
 
+exports.getProjects = async (req, res) => {
+  // If Employee, only show projects they are part of; otherwise show all
+  const query = req.user.role === 'Employee' ? { employees: req.user._id } : {};
+  const projects = await Project.find(query).populate('manager employees', 'name email');
+  res.json(projects);
+};
 
 exports.updateProject = async (req, res) => {
-  try {
-
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    res.json({
-      message: "Project updated",
-      project
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-exports.deleteProject = async (req, res) => {
-  try {
-
-    await Project.findByIdAndDelete(req.params.id);
-
-    res.json({
-      message: "Project deleted"
-    });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(project);
 };

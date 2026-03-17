@@ -1,22 +1,23 @@
-const express = require('express'); 
-const dotenv = require('dotenv');    
+const express = require('express');
+const dotenv = require('dotenv');
 const cors = require('cors');
-const projectRoutes = require('./routes/projectRoutes'); // Import your routes
+const connectDB = require('./config/db');
+const { errorHandler } = require('./middleware/errorMiddleware');
 
-dotenv.config(); // Initialize environment variables 
+dotenv.config();
+connectDB();
 
-const app = express(); // 3. INITIALIZE APP (This fixes your error)
-
-// Middleware [cite: 53]
+const app = express();
+app.use(express.json()); // Proper input validation [cite: 53]
 app.use(cors());
-app.use(express.json()); // Essential for parsing JSON bodies
 
-// Routes [cite: 15]
-// Move your route usage BELOW the 'const app = express()' line
-app.use("/api/projects", projectRoutes); 
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/employees', require('./routes/employeeRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
+app.use('/api/tasks', require('./routes/taskRoutes'));
+
+app.use(errorHandler); // Centralized error handling [cite: 55]
 
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
