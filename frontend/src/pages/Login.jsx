@@ -20,8 +20,14 @@ function Login() {
       });
 
       localStorage.setItem("token", res.data.token);
-
-      navigate("/dashboard");
+      if (res.data.role === "Admin") {
+      
+        navigate("/dashboard");
+      }
+        else{
+          navigate("/employees");
+        }
+      
 
     } catch (error) {
       alert("Login failed");
