@@ -1,33 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import React from 'react';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({ employees: 0, projects: 0, tasks: 0 });
+    // Mock data based on PDF requirements
+    const stats = [
+        { label: 'Total Employees', value: 42, color: 'bg-blue-500' },
+        { label: 'Total Projects', value: 12, color: 'bg-green-500' },
+        { label: 'Active Tasks', value: 8, color: 'bg-yellow-500' },
+        { label: 'Completed Tasks', value: 156, color: 'bg-purple-500' },
+    ];
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const { data } = await api.get('/reports/summary'); // Requirement [cite: 50]
-      setStats(data);
-    };
-    fetchStats();
-  }, []);
-
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Enterprise Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 shadow rounded">
-          <h3>Total Employees</h3> {/* Requirement [cite: 26] */}
-          <p className="text-3xl font-bold">{stats.employees}</p>
+    return (
+        <div className="p-6">
+            <h1 className="text-2xl font-bold mb-6">Enterprise Dashboard</h1>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                {stats.map((stat, i) => (
+                    <div key={i} className={`${stat.color} text-white p-6 rounded-lg shadow`}>
+                        <p className="text-sm opacity-80">{stat.label}</p>
+                        <p className="text-3xl font-bold">{stat.value}</p>
+                    </div>
+                ))}
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md h-64 flex items-center justify-center">
+                <p className="text-gray-400">[Chart Visualization Placeholder - PDF Req: 29]</p>
+            </div>
         </div>
-        <div className="bg-white p-6 shadow rounded">
-          <h3>Total Projects</h3> {/* Requirement [cite: 27] */}
-          <p className="text-3xl font-bold">{stats.projects}</p>
-        </div>
-        {/* Visualization component would go here [cite: 29] */}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;
